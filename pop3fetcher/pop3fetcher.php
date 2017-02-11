@@ -96,15 +96,8 @@ function init(){
 						$Count=0;
 
 					if(sizeof($msglist)>0){
-						$i = 0;					
-						for ($j = 1; $j <= sizeof($msglist); $j++) {
-							//write_log("pop3fetcher.txt", "INTERCEPT: task mail, MSG UIDL: ".$msglist["$j"]);
-							//write_log("pop3fetcher.txt", "INTERCEPT: task mail, LAST UIDL: ".$last_uidl);
-						   if ($msglist["$j"] == $last_uidl) {
-								$i = $j+1;
-								break;
-						   }
-						}
+						$i = 0;
+						$j = 1;
 
 						if ($Count < $i) {
 							POP35::disconnect($c);
