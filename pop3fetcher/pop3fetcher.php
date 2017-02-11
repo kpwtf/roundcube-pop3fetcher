@@ -80,7 +80,7 @@ function init(){
 			// SCARICO I MESSAGGI DAL POP3
 			//print_r($val);
 			$last_uidl = $val['last_uidl'];
-			$c = POP35::connect($val['pop3fetcher_serveraddress'], $val['pop3fetcher_username'], $val['pop3fetcher_password'], intval($val['pop3fetcher_serverport']), $val['pop3fetcher_ssl'], 100);
+			$c = POP35::connect($val['pop3fetcher_serveraddress'], $val['pop3fetcher_username'], $this->rcmail->decrypt($val['pop3fetcher_password']), intval($val['pop3fetcher_serverport']), $val['pop3fetcher_ssl'], 100);
 			//print_r($_RESULT);
 			if($c){
 				$s = POP35::pStat($c, false);// or die(print_r($_RESULT));
@@ -303,7 +303,7 @@ function edit_do(){
 		$this->rcmail->output->command('plugin.edit_do_error_connecting', Array());
         $this->rcmail->output->send('plugin');
 	} else {
-		//$pop3fetcher_password = $rcmail->encrypt($pop3fetcher_password);
+		$pop3fetcher_password = $rcmail->encrypt($pop3fetcher_password);
 		$query = "UPDATE " . get_table_name('pop3fetcher_accounts') . " SET pop3fetcher_email=?, pop3fetcher_username=?, pop3fetcher_password=?, pop3fetcher_serveraddress=?, pop3fetcher_serverport=?, pop3fetcher_SSL=?, pop3fetcher_leaveacopyonserver=?, pop3fetcher_provider=?, default_folder=? WHERE pop3fetcher_id=?";
 		$ret = $rcmail->db->query($query, $pop3fetcher_email, $pop3fetcher_username, $pop3fetcher_password, $pop3fetcher_serveraddress, $pop3fetcher_serverport, $pop3fetcher_ssl, $pop3fetcher_leaveacopy, $pop3fetcher_provider, $pop3fetcher_defaultfolder, $pop3fetcher_id);
 		if($ret){
@@ -359,6 +359,8 @@ function get($pop3fetcher_id=0){
 
 	$ret = $rcmail->db->query($query, $pop3fetcher_id, $user_id);
 	$sql = $rcmail->db->fetch_assoc($ret);
+
+	$sql['pop3fetcher_password'] = $rcmail->decrypt($sql['pop3fetcher_password']);
 
 	return $sql;
 }
@@ -614,7 +616,7 @@ function add_do(){
 			$ret = $rcmail->db->query($query,
 				$pop3fetcher_email,
 				$pop3fetcher_username,
-				$pop3fetcher_password,
+				$rcmail->encrypt($pop3fetcher_password),
 				$pop3fetcher_serveraddress,
 				$pop3fetcher_serverport,
 				$pop3fetcher_ssl,
